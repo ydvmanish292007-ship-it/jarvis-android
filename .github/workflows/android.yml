@@ -343,4 +343,3 @@ jobs:
           name: JARVIS-HUD-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      EOF
