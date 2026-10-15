@@ -237,8 +237,8 @@ jobs:
                           output.setText("JARVIS: " + answer);
 
                           if (tts != null) {
-                              tts.setPitch(0.75f);
-                              tts.setSpeechRate(0.85f);
+                              tts.setPitch(0.60f);
+                              tts.setSpeechRate(0.78f);
                               tts.speak(
                                   answer,
                                   TextToSpeech.QUEUE_FLUSH,
