@@ -297,12 +297,7 @@ jobs:
 
                           if(results != null && !results.isEmpty()) {
                               String command = results.get(0);
-                              output.setText("YOU: " + command +
-                                  "\n\nHUD active. AI backend connection is not configured.");
-                              if(tts != null)
-                                  tts.speak(
-                                      "Boss, I heard you. AI connection is not configured yet.",
-                                      TextToSpeech.QUEUE_FLUSH,null,"reply");
+                              askJarvis(command);
                           }
                       }
                   }
