@@ -187,7 +187,79 @@ jobs:
 
                   voice.setOnClickListener(v -> listen());
               }
+                        void askJarvis(String message) {
+              output.setText("JARVIS: Thinking...");
 
+              new Thread(() -> {
+                  HttpURLConnection conn = null;
+
+                  try {
+                      URL url = new URL(
+                          "https://jarvis-ai-backend.pages.dev/api/ask"
+                      );
+
+                      conn = (HttpURLConnection) url.openConnection();
+                      conn.setRequestMethod("POST");
+                      conn.setConnectTimeout(15000);
+                      conn.setReadTimeout(30000);
+                      conn.setDoOutput(true);
+                      conn.setRequestProperty(
+                          "Content-Type", "application/json; charset=UTF-8"
+                      );
+
+                      JSONObject request = new JSONObject();
+                      request.put("message", message);
+
+                      try (OutputStream os = conn.getOutputStream()) {
+                          os.write(request.toString().getBytes("UTF-8"));
+                      }
+
+                      int code = conn.getResponseCode();
+
+                      java.io.InputStream stream =
+                          (code >= 200 && code < 300)
+                          ? conn.getInputStream()
+                          : conn.getErrorStream();
+
+                      java.util.Scanner scanner =
+                          new java.util.Scanner(stream, "UTF-8")
+                          .useDelimiter("\\A");
+
+                      String raw = scanner.hasNext() ? scanner.next() : "";
+                      scanner.close();
+
+                      JSONObject result = new JSONObject(raw);
+                      String answer = result.optString(
+                          "answer", "Sorry Boss, no answer received."
+                      );
+
+                      runOnUiThread(() -> {
+                          output.setText("JARVIS: " + answer);
+
+                          if (tts != null) {
+                              tts.setPitch(0.75f);
+                              tts.setSpeechRate(0.85f);
+                              tts.speak(
+                                  answer,
+                                  TextToSpeech.QUEUE_FLUSH,
+                                  null,
+                                  "jarvis_reply"
+                              );
+                          }
+                      });
+
+                  } catch (Exception e) {
+                      runOnUiThread(() ->
+                          output.setText(
+                              "Connection error: " + e.getMessage()
+                          )
+                      );
+                  } finally {
+                      if (conn != null) conn.disconnect();
+                  }
+              }).start();
+          }
+          
               void listen() {
                   if(!SpeechRecognizer.isRecognitionAvailable(this)) {
                       output.setText("Speech recognition unavailable.");
